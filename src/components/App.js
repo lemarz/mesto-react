@@ -4,6 +4,8 @@ import Main from "./Main";
 import Footer from "./Footer";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
+import api from "../utils/Api";
+import {CurrentUserContext} from "../contexts/CurrentUserContext";
 
 function App() {
 
@@ -15,6 +17,12 @@ function App() {
 
    const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false)
    const handleEditProfileClick = () => setIsEditProfilePopupOpen(true)
+
+   const [currentUser, setCurrentUser] = React.useState({})
+   React.useEffect(() => {
+      api.getUserInfo()
+         .then(userData => setCurrentUser(userData))
+   }, [])
 
 
    const closeAllPopups = () => {
@@ -31,8 +39,7 @@ function App() {
    }
 
    return (
-      <>
-
+      <><CurrentUserContext.Provider value={currentUser}>
          <div className="page">
             <Header/>
 
@@ -120,7 +127,8 @@ function App() {
             </div>
          </div>
 
-      </>
+
+      </CurrentUserContext.Provider></>
    );
 }
 
