@@ -1,7 +1,7 @@
 import {useContext} from "react";
 import {CurrentUserContext} from "../contexts/CurrentUserContext";
 
-export default function Card({card, onCardClick}) {
+export default function Card({card, onCardClick, onCardLike, onCardDelete}) {
    const {name, link, likes} = card
    const currentUser = useContext(CurrentUserContext)
 
@@ -20,14 +20,23 @@ export default function Card({card, onCardClick}) {
       onCardClick(card)
    }
 
+   const handleLikeClick = () => {
+      onCardLike(card)
+   }
+
+   const handleDeleteClick = () => {
+      onCardDelete(card)
+   }
+
    return (
       <article className="element">
-         {isOwn && <button className="button element__delete-button" type="button"></button>}
+         {isOwn && <button className="button element__delete-button"
+                           type="button" onClick={handleDeleteClick}></button>}
          <img alt={name} className="element__image" src={link} onClick={handleClick}/>
          <div className="element__description">
             <h2 className="element__title">{name}</h2>
             <div className="element__like-container">
-               <button className={cardLikeButtonClassName} type="button"></button>
+               <button className={cardLikeButtonClassName} type="button" onClick={handleLikeClick}></button>
                <p className="element__like-counter">{likes.length}</p>
             </div>
          </div>
