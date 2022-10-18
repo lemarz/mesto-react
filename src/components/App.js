@@ -4,6 +4,7 @@ import Main from "./Main";
 import Footer from "./Footer";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
+import EditProfilePopup from "./EditProfilePopup";
 import api from "../utils/Api";
 import {CurrentUserContext} from "../contexts/CurrentUserContext";
 
@@ -23,6 +24,15 @@ function App() {
       api.getUserInfo()
          .then(userData => setCurrentUser(userData))
    }, [])
+
+   const handleUpdateUser = (userInfo) => {
+      api.setUserInfo(userInfo)
+         .then(newUserInfo => {
+            setCurrentUser(newUserInfo)
+            closeAllPopups()
+         })
+         .catch(console.error)
+   }
 
 
    const closeAllPopups = () => {
@@ -53,26 +63,10 @@ function App() {
          </div>
 
 
-         <PopupWithForm name={'edit-popup'}
-                        title={'Редактировать профиль'}
-                        isOpen={isEditProfilePopupOpen}
-                        onClose={closeAllPopups}
-                        children=
-                           {<>
-                              <input className="popup__input popup__input_el_name" id="name-input" maxLength="40"
-                                     minLength="2"
-                                     name="name"
-                                     placeholder="Имя" required
-                                     type="text"/>
-                              <span className="popup__input-error name-input-error"></span>
-                              <input className="popup__input popup__input_el_description" id="description-input"
-                                     maxLength="200"
-                                     minLength="2"
-                                     name="description" placeholder="Описание профиля"
-                                     required type="text"/>
-                              <span className="popup__input-error description-input-error"></span>
-                              <button className="button popup__save-button" type="submit">Сохранить</button>
-                           </>}
+         <EditProfilePopup isOpen={isEditProfilePopupOpen}
+                           onClose={closeAllPopups}
+                           onUpdateUser={handleUpdateUser}
+
          />
 
 
