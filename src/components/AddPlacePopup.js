@@ -8,7 +8,6 @@ export default function AddPlacePopup({isOpen, onClose, onAddPlace}) {
 
    const handleSubmit = (e) => {
       e.preventDefault()
-
       onAddPlace({
          title: titleRef.current.value,
          link: linkRef.current.value

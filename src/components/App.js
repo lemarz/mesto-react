@@ -13,29 +13,33 @@ import AddPlacePopup from "./AddPlacePopup";
 
 
 function App() {
+   const forms = [...document.forms]
+
+   const [initialCards, setInitialCards] = React.useState([])
+
+   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false)
+   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false)
+   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false)
+   const [selectedCard, setSelectedCard] = React.useState(null)
+
+   const [currentUser, setCurrentUser] = React.useState({})
+
 
    React.useEffect(() => {
       api.getInitialCards()
          .then(initialCardsData => setInitialCards(initialCardsData))
          .catch(err => console.error(err))
-   }, [])
-   const [initialCards, setInitialCards] = React.useState([])
 
-   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false)
-   const handleAddPlaceClick = () => setIsAddPlacePopupOpen(true)
-
-   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false)
-   const handleEditAvatarClick = () => setIsEditAvatarPopupOpen(true)
-
-   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false)
-   const handleEditProfileClick = () => setIsEditProfilePopupOpen(true)
-
-   const [currentUser, setCurrentUser] = React.useState({})
-   React.useEffect(() => {
       api.getUserInfo()
          .then(userData => setCurrentUser(userData))
+         .catch(console.error)
    }, [])
 
+
+   const handleAddPlaceClick = () => setIsAddPlacePopupOpen(true)
+   const handleEditAvatarClick = () => setIsEditAvatarPopupOpen(true)
+   const handleEditProfileClick = () => setIsEditProfilePopupOpen(true)
+   const handleCardClick = (card) => setSelectedCard(card)
 
    const handleUpdateUser = (userInfo) => {
       api.setUserInfo(userInfo)
@@ -70,12 +74,10 @@ function App() {
       setIsEditAvatarPopupOpen(false)
       setIsEditProfilePopupOpen(false)
       setSelectedCard(null)
+
+      forms.forEach(form => form.reset())
    }
 
-   const [selectedCard, setSelectedCard] = React.useState(null)
-   const handleCardClick = (card) => {
-      setSelectedCard(card)
-   }
 
    const handleCardLike = card => {
       const isLiked = card.likes.some(i => i._id === currentUser._id);
@@ -144,7 +146,7 @@ function App() {
          <div className="popup" id="popup_confirm">
             <div className="popup__container popup__container_confirm">
                <h3 className="popup__title">Вы уверены?</h3>
-               <form className="popup__form" name="add-popup_form" noValidate>
+               <form className="popup__form" name="add-popup_form">
                   <button className="button popup__confirm-button" type="submit">Да</button>
                </form>
 
