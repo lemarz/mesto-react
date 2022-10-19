@@ -1,15 +1,25 @@
 import React from "react";
+import api from "../utils/Api";
+import {CurrentUserContext} from "../contexts/CurrentUserContext";
+
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
-import PopupWithForm from "./PopupWithForm";
+
 import ImagePopup from "./ImagePopup";
 import EditProfilePopup from "./EditProfilePopup";
-import api from "../utils/Api";
-import {CurrentUserContext} from "../contexts/CurrentUserContext";
 import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
+
 
 function App() {
+
+   React.useEffect(() => {
+      api.getInitialCards()
+         .then(initialCardsData => setInitialCards(initialCardsData))
+         .catch(err => console.error(err))
+   }, [])
+   const [initialCards, setInitialCards] = React.useState([])
 
    const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false)
    const handleAddPlaceClick = () => setIsAddPlacePopupOpen(true)
@@ -25,6 +35,7 @@ function App() {
       api.getUserInfo()
          .then(userData => setCurrentUser(userData))
    }, [])
+
 
    const handleUpdateUser = (userInfo) => {
       api.setUserInfo(userInfo)
@@ -44,6 +55,15 @@ function App() {
          .catch(console.error)
    }
 
+   const handleAddPlaceSubmit = ({title, link}) => {
+      api.addCard(title, link)
+         .then(newCard => {
+            setInitialCards([newCard, ...initialCards])
+            closeAllPopups()
+         })
+         .catch(console.error)
+   }
+
 
    const closeAllPopups = () => {
       setIsAddPlacePopupOpen(false)
@@ -52,11 +72,32 @@ function App() {
       setSelectedCard(null)
    }
 
-
    const [selectedCard, setSelectedCard] = React.useState(null)
    const handleCardClick = (card) => {
       setSelectedCard(card)
    }
+
+   const handleCardLike = card => {
+      const isLiked = card.likes.some(i => i._id === currentUser._id);
+
+      isLiked
+         ? api.dislikeCard(card._id)
+            .then(newCard =>
+               setInitialCards((state) => state.map((c) => c._id === card._id ? newCard : c)))
+            .catch(console.error)
+
+         : api.likeCard(card._id)
+            .then(newCard =>
+               setInitialCards((state) => state.map((c) => c._id === card._id ? newCard : c)))
+            .catch(console.error)
+   }
+
+   const handleCardDelete = card => {
+      api.deleteCard(card)
+         .then(() => setInitialCards(state => state.filter(c => c._id !== card._id)))
+         .catch(console.error)
+   }
+
 
    return (
       <><CurrentUserContext.Provider value={currentUser}>
@@ -67,6 +108,9 @@ function App() {
                   onEditAvatar={handleEditAvatarClick}
                   onEditProfile={handleEditProfileClick}
                   onCardClick={handleCardClick}
+                  initialCards={initialCards}
+                  onCardLike={handleCardLike}
+                  onCardDelete={handleCardDelete}
             />
 
             <Footer/>
@@ -80,22 +124,9 @@ function App() {
          />
 
 
-         <PopupWithForm name={'add-popup'}
-                        title={'Новое место'}
-                        isOpen={isAddPlacePopupOpen}
+         <AddPlacePopup isOpen={isAddPlacePopupOpen}
                         onClose={closeAllPopups}
-                        children={
-                           <>
-                              <input className="popup__input popup__input_el_title" id="title-input" maxLength="30"
-                                     minLength="2" name="title" placeholder="Название"
-                                     required type="text"/>
-                              <span className="popup__input-error title-input-error"></span>
-                              <input className="popup__input
-            popup__input_el_link" id="link-input" name="link" placeholder="Ссылка на картинку" required type="url"/>
-                              <span className="popup__input-error link-input-error"></span>
-                              <button className="button popup__save-button" type="submit">Создать</button>
-                           </>
-                        }
+                        onAddPlace={handleAddPlaceSubmit}
          />
 
 

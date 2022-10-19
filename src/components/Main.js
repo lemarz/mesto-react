@@ -3,38 +3,18 @@ import React from "react";
 import Card from "./Card";
 import {CurrentUserContext} from "../contexts/CurrentUserContext";
 
-export default function Main({onEditProfile, onAddPlace, onEditAvatar, onCardClick}) {
+export default function Main({
+                                onEditProfile,
+                                onAddPlace,
+                                onEditAvatar,
+                                onCardClick,
+                                initialCards,
+                                onCardLike,
+                                onCardDelete
+                             }) {
 
    const currentUser = React.useContext(CurrentUserContext)
 
-   const [initialCards, setInitialCards] = React.useState([])
-
-   const handleCardLike = card => {
-      const isLiked = card.likes.some(i => i._id === currentUser._id);
-
-      isLiked
-         ? api.dislikeCard(card._id)
-            .then(newCard =>
-               setInitialCards((state) => state.map((c) => c._id === card._id ? newCard : c)))
-            .catch(console.error)
-
-         : api.likeCard(card._id)
-            .then(newCard =>
-               setInitialCards((state) => state.map((c) => c._id === card._id ? newCard : c)))
-            .catch(console.error)
-   }
-
-   const handleCardDelete = card => {
-      api.deleteCard(card)
-         .then(() => setInitialCards(state => state.filter(c => c._id !== card._id)))
-         .catch(console.error)
-   }
-
-   React.useEffect(() => {
-      api.getInitialCards()
-         .then(initialCardsData => setInitialCards(initialCardsData))
-         .catch(err => console.error(err))
-   }, [])
 
    return (
       <main className="content">
@@ -56,8 +36,8 @@ export default function Main({onEditProfile, onAddPlace, onEditAvatar, onCardCli
             {initialCards.map(card =>
                < Card
                   onCardClick={onCardClick}
-                  onCardLike={handleCardLike}
-                  onCardDelete={handleCardDelete}
+                  onCardLike={onCardLike}
+                  onCardDelete={onCardDelete}
                   key={card._id}
                   card={card}
                />
