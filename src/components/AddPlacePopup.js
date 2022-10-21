@@ -6,6 +6,11 @@ export default function AddPlacePopup({isOpen, onClose, onAddPlace}) {
    const titleRef = React.useRef()
    const linkRef = React.useRef()
 
+   React.useEffect(() => {
+      titleRef.current.value = '';
+      linkRef.current.value = '';
+   }, [isOpen])
+
    const handleSubmit = (e) => {
       e.preventDefault()
       onAddPlace({

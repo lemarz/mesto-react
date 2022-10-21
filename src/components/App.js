@@ -14,7 +14,6 @@ import ConfirmDeletePopup from "./ConfirmDeletePopup";
 
 
 function App() {
-   const forms = [...document.forms]
 
    const [initialCards, setInitialCards] = React.useState([])
 
@@ -82,8 +81,6 @@ function App() {
       setIsEditProfilePopupOpen(false)
       setIsConfirmDeletePopupOpen(false)
       setSelectedCard(null)
-
-      forms.forEach(form => form.reset())
    }
 
 
